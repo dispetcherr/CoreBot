@@ -4,6 +4,8 @@ import requests
 import json
 import time
 import re
+import threading
+from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
@@ -32,6 +34,19 @@ dp = Dispatcher(storage=storage)
 
 user_states = {}
 user_reports = {}
+
+class HealthCheckHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b'OK')
+
+def run_health_server():
+    port = int(os.getenv('PORT', 10000))
+    server = HTTPServer(('0.0.0.0', port), HealthCheckHandler)
+    server.serve_forever()
+
+threading.Thread(target=run_health_server, daemon=True).start()
 
 def convert_direct_link(url: str) -> str:
     if 'dropbox.com' in url:
@@ -518,4 +533,4 @@ async def handle_messages(message: types.Message, state: FSMContext):
 
 if __name__ == '__main__':
     import asyncio
-    asyncio.run(dp.start_polling(bot))
+    asyncio
