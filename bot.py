@@ -534,8 +534,21 @@ async def handle_messages(message: types.Message, state: FSMContext):
 if __name__ == '__main__':
     import asyncio
     import time
+    import threading
+    import requests
     
-    # Даём время на запуск health-check сервера
     time.sleep(2)
+    
+    def self_pinger():
+        port = os.getenv('PORT', 10000)
+        url = f"http://localhost:{port}"
+        while True:
+            time.sleep(240)
+            try:
+                requests.get(url, timeout=5)
+            except:
+                pass
+    
+    threading.Thread(target=self_pinger, daemon=True).start()
     
     asyncio.run(dp.start_polling(bot))
