@@ -5,10 +5,9 @@ import json
 import time
 import re
 from urllib.parse import urlparse, parse_qs
-from aiogram import Bot, Dispatcher, types
+from aiogram import Bot, Dispatcher, types, F
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.filters import Command
-from aiogram.filters.text import Text
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.memory import MemoryStorage
 
@@ -116,7 +115,7 @@ async def cmd_start(message: types.Message):
         reply_markup=scanner_keyboard()
     )
 
-@dp.callback_query(Text("scanner"))
+@dp.callback_query(F.data == "scanner")
 async def process_scanner(callback: types.CallbackQuery, state: FSMContext):
     await callback.answer("✅ Режим загрузки файла")
     await state.clear()
@@ -138,7 +137,7 @@ async def process_scanner(callback: types.CallbackQuery, state: FSMContext):
     )
     user_states[callback.from_user.id] = 'waiting_for_file'
 
-@dp.callback_query(Text("scanner_url"))
+@dp.callback_query(F.data == "scanner_url")
 async def process_scanner_url(callback: types.CallbackQuery, state: FSMContext):
     await callback.answer("🔗 Режим загрузки по ссылке")
     await state.clear()
@@ -163,7 +162,7 @@ async def process_scanner_url(callback: types.CallbackQuery, state: FSMContext):
     )
     user_states[callback.from_user.id] = 'waiting_for_url'
 
-@dp.callback_query(Text("check_ready"))
+@dp.callback_query(F.data == "check_ready")
 async def check_ready(callback: types.CallbackQuery, state: FSMContext):
     await callback.answer("🔍 Проверяю готовность...")
     
@@ -196,7 +195,7 @@ async def check_ready(callback: types.CallbackQuery, state: FSMContext):
     else:
         await callback.answer("⏳ Отчет еще не готов. Попробуйте через 1-2 минуты", show_alert=True)
 
-@dp.callback_query(Text("get_detects"))
+@dp.callback_query(F.data == "get_detects")
 async def get_detects(callback: types.CallbackQuery, state: FSMContext):
     user_id = callback.from_user.id
     report_data = user_reports.get(user_id)
@@ -273,7 +272,7 @@ async def get_detects(callback: types.CallbackQuery, state: FSMContext):
         logging.error(f"Detects error: {e}")
         await callback.answer(f"❌ Ошибка: {str(e)[:30]}", show_alert=True)
 
-@dp.callback_query(Text("get_config"))
+@dp.callback_query(F.data == "get_config")
 async def get_config(callback: types.CallbackQuery, state: FSMContext):
     user_id = callback.from_user.id
     report_data = user_reports.get(user_id)
