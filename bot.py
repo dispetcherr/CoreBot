@@ -517,5 +517,5 @@ async def handle_messages(message: types.Message, state: FSMContext):
         )
 
 if __name__ == '__main__':
-    from aiogram import executor
-    executor.start_polling(dp, skip_updates=True)
+    import asyncio
+    asyncio.run(dp.start_polling(bot))
