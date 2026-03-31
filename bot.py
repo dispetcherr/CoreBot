@@ -533,4 +533,9 @@ async def handle_messages(message: types.Message, state: FSMContext):
 
 if __name__ == '__main__':
     import asyncio
-    asyncio
+    import time
+    
+    # Даём время на запуск health-check сервера
+    time.sleep(2)
+    
+    asyncio.run(dp.start_polling(bot))
